@@ -19,16 +19,20 @@ export function emitParentSpan(
   bodyLines: string[],
   indent = "    ",
 ): string {
-  const i = indent
-  const ii = i + "  "
+  const i = indent         // e.g. "    " — level of return statement
+  const ii = `${i}  `     // "      " — level of { }, async (span) => {
+  const iii = `${ii}  `   // "        " — level of config keys and callback body
 
   const attrEntries = Object.entries(attributes)
-  const attrsStr =
-    attrEntries.length > 0
-      ? `{\n${attrEntries.map(([k, v]) => `${ii}  '${k}': ${v}`).join(",\n")},\n${ii}}`
-      : "{}"
+  let attrsStr: string
+  if (attrEntries.length === 0) {
+    attrsStr = "{}"
+  } else {
+    const pairs = attrEntries.map(([k, v]) => `${iii}  '${k}': ${v}`).join(",\n")
+    attrsStr = `{\n${pairs},\n${iii}}`
+  }
 
-  const body = bodyLines.length > 0 ? "\n" + bodyLines.join("\n") + "\n" + ii : ""
+  const bodyStr = bodyLines.length > 0 ? "\n" + bodyLines.join("\n") + "\n" + ii : ""
 
   return [
     `${i}// SENTRY: Start a custom span for the ${spanName} business operation.`,
@@ -36,11 +40,11 @@ export function emitParentSpan(
     `${i}// all SDK-auto-captured child spans (DB queries, HTTP calls).`,
     `${i}return await Sentry.startSpan(`,
     `${ii}{`,
-    `${ii}  name: '${spanName}',`,
-    `${ii}  op: '${spanOp}',`,
-    `${ii}  attributes: ${attrsStr},`,
-    `${ii}}`,
-    `${ii}async (span) => {${body}}`,
+    `${iii}name: '${spanName}',`,
+    `${iii}op: '${spanOp}',`,
+    `${iii}attributes: ${attrsStr},`,
+    `${ii}},`,
+    `${ii}async (span) => {${bodyStr}}`,
     `${i});`,
   ].join("\n")
 }

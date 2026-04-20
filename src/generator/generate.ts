@@ -110,7 +110,7 @@ function processRouteFile(
   const processedBody = processBodyLines(rawBody, parentNode, vocabMap, parentVocab)
 
   // Add two extra spaces per line (body is inside the startSpan async callback)
-  const indentedBody = processedBody.map((l) => (l.trim() === "" ? "" : "  " + l))
+  const indentedBody = processedBody.map((l) => (l.trim() === "" ? "" : "    " + l))
 
   // Resolve span details from the manual span
   const manualSpan = parentNode.pattern.spans.find((s) => s.source === "manual")
