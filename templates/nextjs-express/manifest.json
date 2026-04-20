@@ -1,0 +1,14 @@
+{
+  "stack": "nextjs-express",
+  "version": "1.0.0",
+  "services": [
+    { "id": "frontend", "kind": "frontend", "port": 3000, "health": "/api/health" },
+    { "id": "backend", "kind": "backend", "port": 3001, "health": "/api/health" }
+  ],
+  "markers": [
+    { "id": "parent_span", "marker": "FORGE:PARENT_SPAN", "kind": "backend_route" },
+    { "id": "sdk_enhanced_before_fetch", "marker": "FORGE:SDK_ENHANCED_ATTRS:before_fetch", "kind": "backend_handler" },
+    { "id": "sdk_enhanced_before_query", "marker": "FORGE:SDK_ENHANCED_ATTRS:before_query", "kind": "backend_handler" },
+    { "id": "sentry_init_integrations", "marker": "FORGE:SENTRY_INIT_INTEGRATIONS", "kind": "config" }
+  ]
+}
