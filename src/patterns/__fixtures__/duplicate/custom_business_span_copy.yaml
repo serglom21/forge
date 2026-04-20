@@ -1,0 +1,11 @@
+id: custom_business_span
+title: Duplicate — same id as custom_business_span
+verticals: [fintech]
+stacks: [nextjs-express]
+spans:
+  - id: test.span
+    source: manual
+    op: function
+    attributes: []
+sdk_requirements: []
+sdk_min_version: {}

@@ -1,0 +1,10 @@
+id: malformed_pattern
+title: Pattern with invalid span source
+verticals: [fintech]
+stacks: [nextjs-express]
+spans:
+  - id: bad.span
+    source: not_a_valid_source
+    op: function
+sdk_requirements: []
+sdk_min_version: {}
