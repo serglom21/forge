@@ -5,8 +5,9 @@
    before code existed. You may not modify it.
 3. The user will name a plan in `plans/`. Read it. You may not modify it.
 4. Only modify files in the plan's "files allowed" list.
-5. Never modify MISSION.md, CLAUDE.md, .github/workflows/, patterns/,
-   or anything under templates/ (unless plan explicitly allows).
+5. Never modify MISSION.md, CLAUDE.md, PROJECT_CONTEXT.md,
+   .github/workflows/, patterns/, or anything under templates/
+   (unless plan explicitly allows).
 6. Write tests first for new behavior. Show them fail before implementing.
 7. Commit every 15-30 minutes with descriptive messages.
 8. Run `make verify` before declaring anything done.

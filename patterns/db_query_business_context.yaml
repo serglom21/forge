@@ -23,17 +23,15 @@ spans:
         source: "{attribute_source}"
         injection_point: "before_query"
 
-sdk_requirements:
-  - integration: nodeProfilingIntegration
-    package: "@sentry/node"
-    reason: "Required for DB auto-instrumentation"
+sdk_requirements: []
 
 sdk_min_version:
-  "@sentry/node": "7.100.0"
+  "@sentry/node": "10.49.0"
 
 reference_guidance:
   in_your_codebase: |
     Before your DB call, attach a business attribute to the active span:
       Sentry.getActiveSpan()?.setAttribute("transfer.amount", amount);
-    The DB span itself is auto-captured by the SDK — don't wrap it
-    manually or you'll get two spans for one query.
+    @sentry/node v10 auto-captures DB spans for supported drivers (pg,
+    mysql2, mongodb, Prisma). Don't wrap them manually — you'll get two
+    spans for one query.

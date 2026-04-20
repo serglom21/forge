@@ -22,7 +22,7 @@ generator must match those decisions exactly.
 
 ## Files forbidden
 - All files locked by prior plans
-- MISSION.md, CLAUDE.md, .github/workflows/, patterns/, templates/
+- MISSION.md, CLAUDE.md, PROJECT_CONTEXT.md, .github/workflows/, patterns/, templates/
 
 ## Definition of done
 - Acceptance criteria met

@@ -38,6 +38,7 @@ wrapper block.
 
 ## Files forbidden
 - MISSION.md, CLAUDE.md
+- PROJECT_CONTEXT.md
 - .github/workflows/
 - patterns/
 - templates/  (the template is committed; generator READS but doesn't modify)

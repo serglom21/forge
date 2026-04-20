@@ -1,5 +1,11 @@
 # Plan 01 — EngagementSpec + Pattern Zod schemas
 
+## Prerequisites
+This plan does not depend on `templates/` being populated. The
+three pattern YAMLs in `patterns/` are the only inputs needed to
+design and test the schema. The Next.js+Express template is
+being hand-built in parallel and does not gate this plan.
+
 ## Goal
 Two typed schemas that are the source of truth for all generator input:
 `EngagementSpec` (a project) and `Pattern` (a reusable building block).
@@ -28,6 +34,7 @@ generator must match those decisions exactly.
 
 ## Files forbidden
 - MISSION.md, CLAUDE.md
+- PROJECT_CONTEXT.md
 - .github/workflows/
 - patterns/
 - templates/

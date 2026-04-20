@@ -32,8 +32,8 @@ spans:
 sdk_requirements: []
 
 sdk_min_version:
-  "@sentry/node": "7.100.0"
-  "@sentry/nextjs": "7.100.0"
+  "@sentry/node": "10.49.0"
+  "@sentry/nextjs": "10.49.0"
 
 reference_guidance:
   in_your_codebase: |

@@ -21,6 +21,7 @@ generator must match those decisions exactly.
 
 ## Files forbidden
 - MISSION.md, CLAUDE.md
+- PROJECT_CONTEXT.md
 - patterns/, templates/
 - All source files locked by prior plans
 

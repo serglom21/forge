@@ -148,6 +148,21 @@ This makes double-instrumentation structurally impossible.
   vocabulary (e.g. two HTTP client calls, one for fraud check, one for
   notification).
 
+### SDK version targeting
+
+MVP targets Sentry JavaScript SDK v10 across all packages. All
+`@sentry/*` packages version together, so `@sentry/node` and
+`@sentry/nextjs` must match majors. Patterns declare
+`sdk_min_version` per package; the schema validator refuses
+templates whose pinned SDK version falls below a selected
+pattern's minimum.
+
+When Sentry ships a new major, the fast-follow SDK probe suite
+(Layer 3) catches changes automatically. Until that exists,
+re-check SDK latest before every major customer release or on a
+quarterly cadence, whichever is sooner. Don't retroactively
+revise patterns to hedge — pin to known-good and update forward.
+
 ---
 
 ## Part 4 — The three MVP patterns
@@ -437,7 +452,7 @@ decide with human input.
 | Date | Change | Decided by |
 |---|---|---|
 | 2026-04-19 | File created; consolidates all design decisions up to this point | Sergio + Claude |
-| | | |
+| 2026-04-20 | SDK v10 pinned; sdk_requirements updated to v10 defaults; SDK version targeting policy added (Part 3); CLAUDE.md and plan files updated with PROJECT_CONTEXT.md guard | Sergio + Claude |
 
 Any subsequent change to this file requires a PR with `human-reviewed`
 label. The purpose of this file is to *not drift*.

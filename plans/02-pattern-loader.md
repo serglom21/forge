@@ -11,7 +11,10 @@ generator must match those decisions exactly.
 
 ## Acceptance criteria
 - [ ] `src/patterns/loader.ts` exports `loadPatterns(dir: string): Pattern[]`
-- [ ] Test: given `patterns/` with the committed `distributed_transaction_visibility.yaml`, returns exactly one pattern with the expected `id`
+- [ ] Test: given `patterns/` with the committed three MVP
+      patterns (custom_business_span, db_query_business_context,
+      http_client_business_context), returns exactly three
+      patterns with the expected ids
 - [ ] Test: given a fixture directory with a malformed YAML, throws with the filename in the error message
 - [ ] `make verify` passes
 
@@ -24,6 +27,7 @@ generator must match those decisions exactly.
 
 ## Files forbidden
 - MISSION.md, CLAUDE.md
+- PROJECT_CONTEXT.md
 - .github/workflows/
 - patterns/  (the real patterns — don't touch)
 - templates/

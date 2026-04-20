@@ -26,16 +26,14 @@ spans:
         source: "vocabulary.call_purpose"
         injection_point: "before_fetch"
 
-sdk_requirements:
-  - integration: httpIntegration
-    package: "@sentry/node"
-    reason: "Auto-captures outbound HTTP spans"
+sdk_requirements: []
 
 sdk_min_version:
-  "@sentry/node": "7.100.0"
+  "@sentry/node": "10.49.0"
 
 reference_guidance:
   in_your_codebase: |
     Before your fetch/axios call, set attributes on the active span:
       Sentry.getActiveSpan()?.setAttributes({ vendor: "stripe", "call.purpose": "authorize" });
-    The HTTP span itself is auto-captured — don't wrap manually.
+    @sentry/node v10 auto-captures outbound HTTP spans by default
+    (no integration config needed). Don't wrap manually.
