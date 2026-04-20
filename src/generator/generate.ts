@@ -17,6 +17,37 @@ import { resolveString, resolveVocabulary, type ResolvedVocab } from "./vocabula
 
 const COPY_EXCLUDE = new Set(["node_modules", "dist", ".next"])
 
+interface ManifestMarker {
+  id: string
+  marker: string
+  kind: string
+}
+
+interface TemplateMarkers {
+  parentSpan: string
+  sdkEnhancedPrefix: string
+  initIntegrations: string
+}
+
+function readManifest(templateDir: string): TemplateMarkers {
+  const manifestPath = join(templateDir, "manifest.json")
+  if (!existsSync(manifestPath)) {
+    throw new Error(`manifest.json not found in template directory: ${templateDir}`)
+  }
+  const manifest = JSON.parse(readFileSync(manifestPath, "utf8")) as {
+    markers: ManifestMarker[]
+  }
+  const find = (id: string) => manifest.markers.find((m) => m.id === id)?.marker
+  const handlerMarker = manifest.markers.find((m) => m.kind === "backend_handler")?.marker
+  return {
+    parentSpan: find("parent_span") ?? "FORGE:PARENT_SPAN",
+    sdkEnhancedPrefix: handlerMarker
+      ? handlerMarker.substring(0, handlerMarker.lastIndexOf(":"))
+      : "FORGE:SDK_ENHANCED_ATTRS",
+    initIntegrations: find("sentry_init_integrations") ?? "FORGE:SENTRY_INIT_INTEGRATIONS",
+  }
+}
+
 function copyDir(src: string, dest: string): void {
   mkdirSync(dest, { recursive: true })
   for (const entry of readdirSync(src, { withFileTypes: true })) {
@@ -59,9 +90,11 @@ function processBodyLines(
   parentNode: CompositionNode,
   vocabMap: Record<string, ResolvedVocab>,
   parentVocab: ResolvedVocab,
+  sdkEnhancedPrefix: string,
 ): string[] {
+  const sdkEnhancedRe = new RegExp(`^(\\s*)// ${sdkEnhancedPrefix}:(\\w+)\\s*$`)
   return lines.flatMap((line) => {
-    const m = line.match(/^(\s*)\/\/ FORGE:SDK_ENHANCED_ATTRS:(\w+)\s*$/)
+    const m = line.match(sdkEnhancedRe)
     if (!m) return [line]
 
     const indent = m[1]
@@ -96,10 +129,12 @@ function processRouteFile(
   parentNode: CompositionNode,
   parentVocab: ResolvedVocab,
   vocabMap: Record<string, ResolvedVocab>,
+  markers: TemplateMarkers,
 ): string {
   const lines = content.split("\n")
 
-  const parentSpanIdx = lines.findIndex((l) => /\/\/ FORGE:PARENT_SPAN\s*$/.test(l))
+  const parentSpanRe = new RegExp(`// ${markers.parentSpan}\\s*$`)
+  const parentSpanIdx = lines.findIndex((l) => parentSpanRe.test(l))
   if (parentSpanIdx === -1) return content
 
   const catchIdx = lines.findIndex((l, i) => i > parentSpanIdx && l.includes("} catch ("))
@@ -107,7 +142,7 @@ function processRouteFile(
 
   // Extract body between marker and catch, process SDK_ENHANCED markers
   const rawBody = lines.slice(parentSpanIdx + 1, catchIdx)
-  const processedBody = processBodyLines(rawBody, parentNode, vocabMap, parentVocab)
+  const processedBody = processBodyLines(rawBody, parentNode, vocabMap, parentVocab, markers.sdkEnhancedPrefix)
 
   // Add two extra spaces per line (body is inside the startSpan async callback)
   const indentedBody = processedBody.map((l) => (l.trim() === "" ? "" : "    " + l))
@@ -136,7 +171,7 @@ function processRouteFile(
 /**
  * Replaces FORGE:SENTRY_INIT_INTEGRATIONS in instrument.ts.
  */
-function processInstrumentFile(content: string, parentNode: CompositionNode): string {
+function processInstrumentFile(content: string, parentNode: CompositionNode, initMarker: string): string {
   // Collect sdk_auto requirements from all patterns in the tree
   const allPatterns = [
     parentNode.pattern,
@@ -151,7 +186,7 @@ function processInstrumentFile(content: string, parentNode: CompositionNode): st
   )
 
   const emitted = emitSdkAutoIntegrations(requirements)
-  return content.replace(/^\s*\/\/ FORGE:SENTRY_INIT_INTEGRATIONS\s*$/m, emitted)
+  return content.replace(new RegExp(`^\\s*// ${initMarker}\\s*$`, "m"), emitted)
 }
 
 /**
@@ -182,12 +217,15 @@ export function generate(
   templateDir: string,
   outDir: string,
 ): void {
-  // 1. Build composition tree
+  // 1. Read manifest to get marker strings
+  const markers = readManifest(templateDir)
+
+  // 2. Build composition tree
   const tree = buildCompositionTree(patterns, spec)
   if (tree.length === 0) throw new Error("No root patterns found in spec")
   const parentNode = tree[0]
 
-  // 2. Resolve vocabularies
+  // 3. Resolve vocabularies
   const parentVocab = resolveVocabulary(
     parentNode.pattern,
     spec.vocabulary[parentNode.pattern.id] ?? {},
@@ -216,7 +254,7 @@ export function generate(
   const newRoutePath = join(backendSrcDir, "routes", `${entityPlural}.ts`)
 
   let routeContent = readFileSync(itemsRoutePath, "utf8")
-  routeContent = processRouteFile(routeContent, parentNode, parentVocab, vocabMap)
+  routeContent = processRouteFile(routeContent, parentNode, parentVocab, vocabMap, markers)
   routeContent = routeContent
     .replaceAll(`'/items/:id'`, `'/${entityPlural}/:id'`)
     .replaceAll(`'/items'`, `'/${entityPlural}'`)
@@ -236,7 +274,7 @@ export function generate(
   const instrumentPath = join(backendSrcDir, "instrument.ts")
   if (existsSync(instrumentPath)) {
     const instrumentContent = readFileSync(instrumentPath, "utf8")
-    writeFileSync(instrumentPath, processInstrumentFile(instrumentContent, parentNode))
+    writeFileSync(instrumentPath, processInstrumentFile(instrumentContent, parentNode, markers.initIntegrations))
   }
 
   // 7. Rename frontend app/items/ → app/{entityPlural}/

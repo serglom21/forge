@@ -199,3 +199,18 @@ describe("generate — fintech transfers spec", () => {
     ])
   })
 })
+
+// ─── Missing manifest ────────────────────────────────────────────────────────
+
+describe("generate — missing manifest.json", () => {
+  it("throws a clear error when manifest.json is missing from templateDir", () => {
+    const emptyTemplateDir = mkdtempSync(join(tmpdir(), "forge-empty-template-"))
+    try {
+      expect(() =>
+        generate(RECIPES_SPEC, [customBusinessSpan], emptyTemplateDir, tmpDir),
+      ).toThrow(/manifest\.json/)
+    } finally {
+      rmSync(emptyTemplateDir, { recursive: true, force: true })
+    }
+  })
+})
