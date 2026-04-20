@@ -93,4 +93,56 @@ describe("validateSpecAgainstPatterns", () => {
     expect(() => validateSpecAgainstPatterns(bad, patterns)).toThrow(SpecValidationError)
     expect(() => validateSpecAgainstPatterns(bad, patterns)).toThrow(/requires_parent|parent/i)
   })
+
+  it("throws when requires_parent pattern's composes_with partner is absent even if a different parent provider is in spec", () => {
+    const patterns = loadAllPatterns()
+
+    // A foreign pattern that provides parent_span but is NOT in db_query's composes_with
+    const foreignParent: Pattern = PatternSchema.parse({
+      id: "foreign_parent",
+      title: "Foreign Parent",
+      verticals: ["any"],
+      stacks: ["nextjs-express"],
+      vocabulary: {},
+      provides: { parent_span: "foreign.span" },
+      spans: [],
+      sdk_requirements: [],
+      sdk_min_version: {},
+    })
+
+    // Spec: db_query (requires_parent, composes_with: [custom_business_span]) + foreign_parent
+    // foreign_parent provides parent_span but is NOT in db_query.composes_with
+    const bad: EngagementSpec = {
+      ...BASE_SPEC,
+      patternIds: ["db_query_business_context", "foreign_parent"],
+      vocabulary: {
+        db_query_business_context: {
+          attribute_key: "x.amount",
+          attribute_source: "req.body.amount",
+        },
+      },
+    }
+
+    const allPatterns = [...patterns, foreignParent]
+    expect(() => validateSpecAgainstPatterns(bad, allPatterns)).toThrow(SpecValidationError)
+    expect(() => validateSpecAgainstPatterns(bad, allPatterns)).toThrow(/composes_with|requires_parent/i)
+  })
+
+  it("throws naming the unknown key when a vocabulary override has an undeclared token key", () => {
+    const patterns = loadAllPatterns()
+    const bad: EngagementSpec = {
+      ...BASE_SPEC,
+      vocabulary: {
+        ...BASE_SPEC.vocabulary,
+        custom_business_span: {
+          entity: "transfer",
+          entity_plural: "transfers",
+          action: "execute",
+          entitty: "typo-key",  // undeclared token in custom_business_span vocabulary
+        },
+      },
+    }
+    expect(() => validateSpecAgainstPatterns(bad, patterns)).toThrow(SpecValidationError)
+    expect(() => validateSpecAgainstPatterns(bad, patterns)).toThrow(/entitty/)
+  })
 })

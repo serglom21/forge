@@ -98,8 +98,12 @@ function spanTokenRefs(span: z.infer<typeof SpanSchema>): string[] {
   const tokens: string[] = []
   tokens.push(...extractTokenRefs(span.id))
   if (span.source === "manual") {
+    if (span.description) {
+      tokens.push(...extractTokenRefs(span.description))
+    }
     for (const attr of span.attributes) {
       tokens.push(...extractTokenRefs(attr.key))
+      tokens.push(...extractTokenRefs(attr.source))
     }
   }
   if (span.source === "sdk_enhanced") {

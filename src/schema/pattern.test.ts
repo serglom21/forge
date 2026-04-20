@@ -157,6 +157,45 @@ describe("PatternSchema — token reference validation", () => {
     }
     expect(() => PatternSchema.parse(good)).not.toThrow()
   })
+
+  it("rejects a pattern with an undeclared {token} in span description", () => {
+    const bad = {
+      id: "bad_desc_token",
+      title: "Bad desc token",
+      verticals: ["fintech"],
+      stacks: ["nextjs-express"],
+      vocabulary: {},
+      spans: [{
+        id: "test.span",
+        source: "manual",
+        op: "function",
+        description: "POST /api/{entity_plural}",
+        attributes: [],
+      }],
+      sdk_requirements: [],
+      sdk_min_version: {},
+    }
+    expect(() => PatternSchema.parse(bad)).toThrow(/entity_plural|not declared/i)
+  })
+
+  it("rejects a pattern with an undeclared {token} in manual span attributes[].source", () => {
+    const bad = {
+      id: "bad_attr_source",
+      title: "Bad attr source token",
+      verticals: ["fintech"],
+      stacks: ["nextjs-express"],
+      vocabulary: {},
+      spans: [{
+        id: "test.span",
+        source: "manual",
+        op: "function",
+        attributes: [{ key: "my.attr", type: "string", source: "{entity_id}.value" }],
+      }],
+      sdk_requirements: [],
+      sdk_min_version: {},
+    }
+    expect(() => PatternSchema.parse(bad)).toThrow(/entity_id|not declared/i)
+  })
 })
 
 describe("PatternSchema — vocabulary token union", () => {
