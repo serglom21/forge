@@ -1,0 +1,12 @@
+{
+  "name": "se-copilot-mvp",
+  "private": true,
+  "packageManager": "pnpm@8.15.4",
+  "scripts": {
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "typescript": "5.4.5",
+    "vitest": "1.6.0"
+  }
+}
