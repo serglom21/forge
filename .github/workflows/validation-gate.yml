@@ -27,7 +27,7 @@ jobs:
         run: |
           set -euo pipefail
           CHANGED=$(git diff --name-only origin/${{ github.base_ref }}...HEAD)
-          PROTECTED=$(echo "$CHANGED" | grep -E '^(patterns/|MISSION\.md$|CLAUDE\.md$|\.github/workflows/)' || true)
+          PROTECTED=$(echo "$CHANGED" | grep -E '^(patterns/|MISSION\.md$|PROJECT_CONTEXT\.md$|CLAUDE\.md$|\.github/workflows/)' || true)
           if [ -n "$PROTECTED" ]; then
             LABELS='${{ toJSON(github.event.pull_request.labels.*.name) }}'
             if ! echo "$LABELS" | grep -q 'human-reviewed'; then
