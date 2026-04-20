@@ -1,0 +1,42 @@
+id: custom_business_span
+title: Custom business span
+maturity: stable
+
+verticals: [fintech, ecommerce, healthcare, saas, media, manufacturing, logistics]
+stacks: [nextjs-express]
+layer: backend
+
+vocabulary:
+  entity:        { required: true, description: "Business noun (transfer, recipe, signup, policy)" }
+  entity_plural: { required: true, description: "Plural form for routes and UI" }
+  action:        { required: true, description: "Verb for the operation (execute, submit, create)" }
+
+surface:
+  pages:
+    - { id: form, route: "/{entity_plural}/new", kind: form }
+  routes:
+    - { method: POST, path: "/api/{entity_plural}", handler: "create_{entity}" }
+
+provides:
+  parent_span: "{entity}.{action}"
+
+spans:
+  - id: "{entity}.{action}"
+    role: parent
+    source: manual
+    op: function
+    description: "POST /api/{entity_plural}"
+    attributes:
+      - { key: "{entity}.id", type: string, source: "req.body.id" }
+
+sdk_requirements: []
+
+sdk_min_version:
+  "@sentry/node": "7.100.0"
+  "@sentry/nextjs": "7.100.0"
+
+reference_guidance:
+  in_your_codebase: |
+    The handler for your main business operation. Wrap its body in a
+    Sentry.startSpan() call and attach whatever business dimensions
+    make your traces queryable (customer tier, amount, region).

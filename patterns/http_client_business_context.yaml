@@ -1,0 +1,41 @@
+id: http_client_business_context
+title: Business context on outbound HTTP spans
+maturity: stable
+
+verticals: [any]
+stacks: [nextjs-express]
+layer: backend
+
+composes_with: [custom_business_span]
+requires_parent: true
+
+vocabulary:
+  vendor_name:  { required: true, description: "Vendor identifier for attribution (e.g. stripe, twilio)" }
+  call_purpose: { required: true, description: "What this call does (e.g. authorize, notify, verify)" }
+
+spans:
+  - id: "http.client.enhanced"
+    source: sdk_enhanced
+    op: http.client
+    expected_attributes: [http.method, http.url, http.status_code]
+    attributes_to_inject:
+      - key: "vendor"
+        source: "vocabulary.vendor_name"
+        injection_point: "before_fetch"
+      - key: "call.purpose"
+        source: "vocabulary.call_purpose"
+        injection_point: "before_fetch"
+
+sdk_requirements:
+  - integration: httpIntegration
+    package: "@sentry/node"
+    reason: "Auto-captures outbound HTTP spans"
+
+sdk_min_version:
+  "@sentry/node": "7.100.0"
+
+reference_guidance:
+  in_your_codebase: |
+    Before your fetch/axios call, set attributes on the active span:
+      Sentry.getActiveSpan()?.setAttributes({ vendor: "stripe", "call.purpose": "authorize" });
+    The HTTP span itself is auto-captured — don't wrap manually.
