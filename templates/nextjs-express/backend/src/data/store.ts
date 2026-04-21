@@ -10,10 +10,53 @@ export interface Item {
   createdAt: string;
 }
 
+const now = Date.now();
+const HOUR = 3600000;
+const DAY = 86400000;
+
 const items: Item[] = [
-  { id: 'item_1', name: 'Sample Item 1', description: 'A pre-seeded item for demo purposes', status: 'completed', createdAt: new Date(Date.now() - 86400000).toISOString() },
-  { id: 'item_2', name: 'Sample Item 2', description: 'Another pre-seeded item', status: 'completed', createdAt: new Date(Date.now() - 43200000).toISOString() },
-  { id: 'item_3', name: 'Sample Item 3', description: 'A pending item', status: 'pending', createdAt: new Date().toISOString() },
+  {
+    id: 'item_8x2k9f',
+    name: 'Q2 vendor payment — Globex Corp',
+    description: 'Engineering services retainer, quarterly invoice #INV-2026-0847',
+    status: 'completed',
+    createdAt: new Date(now - 2 * HOUR).toISOString(),
+  },
+  {
+    id: 'item_7m1p3q',
+    name: 'Payroll batch #247',
+    description: 'Monthly payroll — 142 employees, March 2026',
+    status: 'processing',
+    createdAt: new Date(now - 18 * 60000).toISOString(),
+  },
+  {
+    id: 'item_6n4w8r',
+    name: 'Office lease deposit — London',
+    description: 'Expansion office lease deposit, HSBC London branch',
+    status: 'completed',
+    createdAt: new Date(now - 1 * DAY).toISOString(),
+  },
+  {
+    id: 'item_5k9j2m',
+    name: 'Vendor refund — CloudStack Inc',
+    description: 'Over-billed infrastructure charges, ticket #CS-4419',
+    status: 'pending',
+    createdAt: new Date(now - 2 * DAY).toISOString(),
+  },
+  {
+    id: 'item_4p7h1n',
+    name: 'SaaS renewal — Datadog',
+    description: 'Annual enterprise plan renewal',
+    status: 'completed',
+    createdAt: new Date(now - 3 * DAY).toISOString(),
+  },
+  {
+    id: 'item_3r6t5v',
+    name: 'Conference sponsorship — SentryConf',
+    description: 'Gold tier sponsorship package, May 2026',
+    status: 'completed',
+    createdAt: new Date(now - 5 * DAY).toISOString(),
+  },
 ];
 
 export function getAllItems(): Item[] {
@@ -26,7 +69,7 @@ export function getItemById(id: string): Item | undefined {
 
 export function createItem(data: { name: string; description: string }): Item {
   const item: Item = {
-    id: `item_${Date.now()}`,
+    id: `item_${Math.random().toString(36).slice(2, 8)}`,
     name: data.name,
     description: data.description,
     status: 'pending',

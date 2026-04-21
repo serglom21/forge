@@ -13,26 +13,20 @@ interface Item {
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001';
 
-const STATUS_STYLES: Record<string, { backgroundColor: string; color: string }> = {
-  completed: { backgroundColor: '#ecfdf5', color: '#059669' },
-  active:    { backgroundColor: '#fffbeb', color: '#d97706' },
-  pending:   { backgroundColor: '#fffbeb', color: '#d97706' },
-  error:     { backgroundColor: '#fef2f2', color: '#dc2626' },
+const statusColors: Record<string, { bg: string; color: string }> = {
+  completed: { bg: '#ecfdf5', color: '#059669' },
+  processing: { bg: '#fffbeb', color: '#d97706' },
+  pending: { bg: '#f1f3f5', color: '#4b5563' },
+  failed: { bg: '#fef2f2', color: '#dc2626' },
 };
 
-function StatusBadge({ status }: { status: string }) {
-  const colors = STATUS_STYLES[status] ?? { backgroundColor: '#f1f3f5', color: '#4b5563' };
-  return (
-    <span style={{
-      fontSize: '12px',
-      fontWeight: 500,
-      padding: '2px 10px',
-      borderRadius: '9999px',
-      ...colors,
-    }}>
-      {status}
-    </span>
-  );
+function formatDate(dateStr: string): string {
+  const d = new Date(dateStr);
+  return d.toLocaleDateString('en-US', {
+    month: 'short', day: 'numeric', year: 'numeric',
+  }) + ' · ' + d.toLocaleTimeString('en-US', {
+    hour: 'numeric', minute: '2-digit',
+  });
 }
 
 export default function ItemDetailPage() {
@@ -51,62 +45,118 @@ export default function ItemDetailPage() {
       .catch(() => setLoading(false));
   }, [params.id]);
 
-  if (loading) return <p style={{ color: '#9ca3af', fontSize: '14px' }}>Loading...</p>;
-  if (notFound) return <p style={{ color: '#dc2626', fontSize: '14px' }}>Item not found.</p>;
-  if (!item) return <p style={{ color: '#dc2626', fontSize: '14px' }}>Failed to load item.</p>;
+  if (loading) {
+    return (
+      <div>
+        <a href="/items" style={{ fontSize: '13px', color: '#4b5563', textDecoration: 'none' }}>← Items</a>
+        <div style={{
+          marginTop: '16px', height: '200px', backgroundColor: '#ffffff',
+          border: '1px solid #e5e7eb', borderRadius: '8px',
+          animation: 'pulse 1.5s ease-in-out infinite',
+        }} />
+        <style>{`@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }`}</style>
+      </div>
+    );
+  }
+
+  if (notFound) {
+    return (
+      <div>
+        <a href="/items" style={{ fontSize: '13px', color: '#4b5563', textDecoration: 'none' }}>← Items</a>
+        <div style={{ textAlign: 'center', padding: '48px', color: '#4b5563', fontSize: '14px' }}>
+          Item not found.
+        </div>
+      </div>
+    );
+  }
+
+  if (!item) return null;
+
+  const sc = statusColors[item.status] || statusColors.pending;
 
   return (
-    <div style={{ maxWidth: '640px' }}>
-      <a href="/items" style={{
-        display: 'inline-block',
-        fontSize: '14px',
-        color: '#4b5563',
-        textDecoration: 'none',
-        marginBottom: '16px',
-      }}>
-        ← Back to Items
-      </a>
+    <div>
+      <a href="/items" style={{ fontSize: '13px', color: '#4b5563', textDecoration: 'none' }}>← Items</a>
 
       <div style={{
-        padding: '20px',
-        backgroundColor: '#ffffff',
-        border: '1px solid #e5e7eb',
-        borderRadius: '8px',
+        marginTop: '16px', backgroundColor: '#ffffff', border: '1px solid #e5e7eb',
+        borderRadius: '8px', overflow: 'hidden',
         boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
       }}>
-        <div style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'flex-start',
-          marginBottom: '16px',
-        }}>
-          <h1 style={{ fontSize: '24px', fontWeight: 600, margin: 0, color: '#111827' }}>
-            {item.name}
-          </h1>
-          <StatusBadge status={item.status} />
+        {/* Header */}
+        <div style={{ padding: '20px 20px 16px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '6px' }}>
+                <h1 style={{ fontSize: '18px', fontWeight: 600, margin: 0 }}>{item.name}</h1>
+                <span style={{
+                  fontSize: '11px', padding: '1px 8px', borderRadius: '9999px',
+                  backgroundColor: sc.bg, color: sc.color, fontWeight: 500,
+                }}>
+                  {item.status}
+                </span>
+              </div>
+              <p style={{ fontSize: '13px', color: '#4b5563', margin: 0, lineHeight: 1.5 }}>
+                {item.description}
+              </p>
+            </div>
+          </div>
         </div>
 
-        <p style={{ color: '#4b5563', fontSize: '14px', lineHeight: 1.6, margin: '0 0 20px' }}>
-          {item.description}
-        </p>
+        {/* Divider */}
+        <div style={{ borderTop: '1px solid #e5e7eb' }} />
 
-        <div style={{
-          display: 'flex',
-          gap: '24px',
-          paddingTop: '16px',
-          borderTop: '1px solid #e5e7eb',
-        }}>
+        {/* Metadata grid */}
+        <div style={{ padding: '16px 20px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px 32px' }}>
           <div>
-            <div style={{ fontSize: '13px', color: '#9ca3af', marginBottom: '2px' }}>Item ID</div>
-            <span style={{ fontFamily: 'ui-monospace, SFMono-Regular, monospace', fontSize: '13px', color: '#9ca3af' }}>
+            <div style={{
+              fontSize: '11px', color: '#9ca3af', marginBottom: '2px',
+              textTransform: 'uppercase' as const, letterSpacing: '0.5px',
+            }}>
+              Item ID
+            </div>
+            <div style={{ fontSize: '13px', fontFamily: 'ui-monospace, SFMono-Regular, monospace', color: '#4b5563' }}>
               {item.id}
-            </span>
+            </div>
           </div>
+
           <div>
-            <div style={{ fontSize: '13px', color: '#9ca3af', marginBottom: '2px' }}>Created</div>
-            <span style={{ fontFamily: 'ui-monospace, SFMono-Regular, monospace', fontSize: '13px', color: '#9ca3af' }}>
-              {new Date(item.createdAt).toLocaleString()}
-            </span>
+            <div style={{
+              fontSize: '11px', color: '#9ca3af', marginBottom: '2px',
+              textTransform: 'uppercase' as const, letterSpacing: '0.5px',
+            }}>
+              Status
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px' }}>
+              <div style={{
+                width: '6px', height: '6px', borderRadius: '50%', backgroundColor: sc.color,
+              }} />
+              {item.status}
+            </div>
+          </div>
+
+          <div>
+            <div style={{
+              fontSize: '11px', color: '#9ca3af', marginBottom: '2px',
+              textTransform: 'uppercase' as const, letterSpacing: '0.5px',
+            }}>
+              Created
+            </div>
+            <div style={{ fontSize: '13px', fontFamily: 'ui-monospace, SFMono-Regular, monospace', color: '#4b5563' }}>
+              {formatDate(item.createdAt)}
+            </div>
+          </div>
+
+          <div>
+            <div style={{
+              fontSize: '11px', color: '#9ca3af', marginBottom: '2px',
+              textTransform: 'uppercase' as const, letterSpacing: '0.5px',
+            }}>
+              Last updated
+            </div>
+            <div style={{ fontSize: '13px', fontFamily: 'ui-monospace, SFMono-Regular, monospace', color: '#4b5563' }}>
+              {formatDate(item.createdAt)}
+            </div>
           </div>
         </div>
       </div>
