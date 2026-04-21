@@ -25,7 +25,7 @@ function StatusBadge({ status }: { status: string }) {
     <span style={{
       fontSize: '12px',
       fontWeight: 500,
-      padding: '2px 8px',
+      padding: '2px 10px',
       borderRadius: '9999px',
       ...colors,
     }}>
@@ -81,13 +81,28 @@ export default function ItemsPage() {
           backgroundColor: '#ffffff',
           border: '1px solid #e5e7eb',
           borderRadius: '8px',
-          color: '#9ca3af',
-          fontSize: '14px',
         }}>
-          No items yet. Create one to see traces in Sentry.
+          <p style={{ color: '#4b5563', fontSize: '14px', margin: '0 0 16px' }}>
+            No items yet. Create one to see traces in Sentry.
+          </p>
+          <a
+            href="/items/new"
+            style={{
+              display: 'inline-block',
+              padding: '8px 16px',
+              backgroundColor: '#6366f1',
+              color: '#ffffff',
+              borderRadius: '6px',
+              textDecoration: 'none',
+              fontSize: '14px',
+              fontWeight: 500,
+            }}
+          >
+            Create your first item
+          </a>
         </div>
       ) : (
-        <div style={{ display: 'grid', gap: '8px' }}>
+        <div style={{ display: 'grid', gap: '12px' }}>
           {items.map(item => (
             <a
               key={item.id}
@@ -100,7 +115,7 @@ export default function ItemsPage() {
                 borderRadius: '8px',
                 textDecoration: 'none',
                 color: '#111827',
-                boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
+                boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
               }}
             >
               <div style={{
@@ -112,9 +127,12 @@ export default function ItemsPage() {
                 <span style={{ fontWeight: 600, fontSize: '14px' }}>{item.name}</span>
                 <StatusBadge status={item.status} />
               </div>
-              <p style={{ margin: 0, color: '#4b5563', fontSize: '14px', lineHeight: 1.6 }}>
+              <p style={{ margin: '0 0 8px', color: '#4b5563', fontSize: '14px', lineHeight: 1.6 }}>
                 {item.description}
               </p>
+              <div style={{ fontFamily: 'ui-monospace, SFMono-Regular, monospace', fontSize: '13px', color: '#9ca3af' }}>
+                {item.id} · {new Date(item.createdAt).toLocaleDateString()}
+              </div>
             </a>
           ))}
         </div>

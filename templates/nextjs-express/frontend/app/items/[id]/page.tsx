@@ -26,7 +26,7 @@ function StatusBadge({ status }: { status: string }) {
     <span style={{
       fontSize: '12px',
       fontWeight: 500,
-      padding: '2px 8px',
+      padding: '2px 10px',
       borderRadius: '9999px',
       ...colors,
     }}>
@@ -60,9 +60,9 @@ export default function ItemDetailPage() {
       <a href="/items" style={{
         display: 'inline-block',
         fontSize: '14px',
-        color: '#6366f1',
+        color: '#4b5563',
         textDecoration: 'none',
-        marginBottom: '20px',
+        marginBottom: '16px',
       }}>
         ← Back to Items
       </a>
@@ -72,7 +72,7 @@ export default function ItemDetailPage() {
         backgroundColor: '#ffffff',
         border: '1px solid #e5e7eb',
         borderRadius: '8px',
-        boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
+        boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
       }}>
         <div style={{
           display: 'flex',
@@ -94,17 +94,17 @@ export default function ItemDetailPage() {
           display: 'flex',
           gap: '24px',
           paddingTop: '16px',
-          borderTop: '1px solid #f1f3f5',
+          borderTop: '1px solid #e5e7eb',
         }}>
           <div>
-            <div style={{ fontSize: '12px', color: '#9ca3af', marginBottom: '2px' }}>Item ID</div>
-            <span style={{ fontFamily: 'ui-monospace, monospace', fontSize: '13px', color: '#4b5563' }}>
+            <div style={{ fontSize: '13px', color: '#9ca3af', marginBottom: '2px' }}>Item ID</div>
+            <span style={{ fontFamily: 'ui-monospace, SFMono-Regular, monospace', fontSize: '13px', color: '#9ca3af' }}>
               {item.id}
             </span>
           </div>
           <div>
-            <div style={{ fontSize: '12px', color: '#9ca3af', marginBottom: '2px' }}>Created</div>
-            <span style={{ fontSize: '13px', color: '#4b5563' }}>
+            <div style={{ fontSize: '13px', color: '#9ca3af', marginBottom: '2px' }}>Created</div>
+            <span style={{ fontFamily: 'ui-monospace, SFMono-Regular, monospace', fontSize: '13px', color: '#9ca3af' }}>
               {new Date(item.createdAt).toLocaleString()}
             </span>
           </div>

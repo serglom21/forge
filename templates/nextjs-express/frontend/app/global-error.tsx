@@ -20,10 +20,30 @@ export default function GlobalError({
   }, [error]);
 
   return (
-    <html>
-      <body style={{ fontFamily: 'system-ui', padding: '40px', textAlign: 'center' }}>
-        <h1>Something went wrong</h1>
-        <p style={{ color: '#666' }}>This error has been reported to Sentry.</p>
+    <html lang="en">
+      <body style={{
+        margin: 0,
+        fontFamily: 'system-ui, -apple-system, sans-serif',
+        backgroundColor: '#f8f9fa',
+        color: '#111827',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: '100vh',
+      }}>
+        <div style={{ textAlign: 'center', padding: '32px 24px', maxWidth: '480px' }}>
+          <h1 style={{ fontSize: '24px', fontWeight: 600, color: '#111827', margin: '0 0 8px' }}>
+            Something went wrong
+          </h1>
+          <p style={{ fontSize: '14px', color: '#4b5563', lineHeight: 1.6, margin: '0 0 24px' }}>
+            An unexpected error occurred. This error has been reported to Sentry.
+          </p>
+          {error.digest && (
+            <p style={{ fontFamily: 'ui-monospace, SFMono-Regular, monospace', fontSize: '13px', color: '#9ca3af', margin: 0 }}>
+              {error.digest}
+            </p>
+          )}
+        </div>
       </body>
     </html>
   );

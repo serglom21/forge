@@ -21,7 +21,7 @@ export default function Home() {
             borderRadius: '8px',
             textDecoration: 'none',
             color: '#111827',
-            boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
+            boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
           }}
         >
           <div style={{ fontWeight: 600, fontSize: '15px', marginBottom: '6px' }}>
@@ -43,7 +43,7 @@ export default function Home() {
             borderRadius: '8px',
             textDecoration: 'none',
             color: '#111827',
-            boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
+            boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
           }}
         >
           <div style={{ fontWeight: 600, fontSize: '15px', marginBottom: '6px' }}>

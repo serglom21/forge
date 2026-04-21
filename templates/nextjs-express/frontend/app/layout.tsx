@@ -22,26 +22,23 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           padding: '0 24px',
           display: 'flex',
           alignItems: 'center',
-          height: '56px',
-          gap: '32px',
+          justifyContent: 'space-between',
+          height: '48px',
         }}>
           <a href="/" style={{
             fontWeight: 600,
             fontSize: '15px',
             textDecoration: 'none',
             color: '#111827',
-            letterSpacing: '-0.01em',
-            flexShrink: 0,
           }}>
             Sentry Ref App
           </a>
-          <div style={{ display: 'flex', gap: '2px', alignItems: 'center' }}>
+          <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
             <a href="/items" style={{
               fontSize: '14px',
               textDecoration: 'none',
               color: '#4b5563',
               padding: '6px 10px',
-              borderRadius: '6px',
             }}>
               Items
             </a>
@@ -50,7 +47,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               textDecoration: 'none',
               color: '#4b5563',
               padding: '6px 10px',
-              borderRadius: '6px',
             }}>
               New Item
             </a>
