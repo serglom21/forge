@@ -52,9 +52,93 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: make verify
 
+  generated-app-builds:
+    name: Build generated app (${{ matrix.spec }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        spec: [fintech-transfers, simple-recipes]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v3
+        with:
+          version: ${{ env.PNPM_VERSION }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+      - name: Install repo deps
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate reference app
+        run: |
+          pnpm exec tsx scripts/generate.ts \
+            --spec test-specs/${{ matrix.spec }}.json \
+            --out generated/${{ matrix.spec }}
+
+      - name: Build backend
+        working-directory: generated/${{ matrix.spec }}/reference-app/backend
+        run: |
+          pnpm install
+          pnpm exec tsc --noEmit
+          pnpm build
+
+      - name: Build frontend
+        working-directory: generated/${{ matrix.spec }}/reference-app/frontend
+        env:
+          NEXT_TELEMETRY_DISABLED: 1
+        run: |
+          pnpm install
+          pnpm build
+
+      - name: Upload generated app
+        uses: actions/upload-artifact@v4
+        with:
+          name: generated-app-${{ matrix.spec }}
+          # Include dist/ and .next/ (proves build succeeded) but skip node_modules.
+          path: |
+            generated/${{ matrix.spec }}
+            !generated/${{ matrix.spec }}/**/node_modules/**
+
+  generated-app-boots:
+    name: Boot generated app (${{ matrix.spec }})
+    runs-on: ubuntu-latest
+    needs: generated-app-builds
+    strategy:
+      fail-fast: false
+      matrix:
+        spec: [fintech-transfers, simple-recipes]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v3
+        with:
+          version: ${{ env.PNPM_VERSION }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Download generated app
+        uses: actions/download-artifact@v4
+        with:
+          name: generated-app-${{ matrix.spec }}
+          path: generated/${{ matrix.spec }}
+
+      - name: Install backend deps
+        working-directory: generated/${{ matrix.spec }}/reference-app/backend
+        run: pnpm install
+
+      - name: Install frontend deps
+        working-directory: generated/${{ matrix.spec }}/reference-app/frontend
+        run: pnpm install
+
+      - name: Boot check
+        run: bash scripts/ci-boot-check.sh generated/${{ matrix.spec }}
+
   validation-gate-passed:
     name: Validation gate passed
-    needs: [protect-curated-assets, verify]
+    needs: [protect-curated-assets, verify, generated-app-builds, generated-app-boots]
     runs-on: ubuntu-latest
     if: always()
     steps:
