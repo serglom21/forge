@@ -1,0 +1,8 @@
+export { generate } from "./generate"
+export { buildCompositionTree } from "./composition"
+export type { CompositionNode } from "./composition"
+export { resolveVocabulary, resolveString } from "./vocabulary"
+export type { ResolvedVocab } from "./vocabulary"
+export { emitParentSpan, emitSdkEnhancedAttrs, emitSdkAutoIntegrations } from "./emit"
+export type { AttrEntry, SdkAutoRequirement } from "./emit"
+export { generateReadme, generateImplementationGuide, generateSentryMd, generateDashboardJson } from "./files"
